@@ -1,0 +1,91 @@
+version: "3"
+services:
+  rabbitmq:
+    hostname: rabbitmq
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - 'rabbitmq_data:/data'
+    restart: on-failure
+    networks:
+      - myapp_network
+
+  kong:
+    image: "kong:latest"
+    restart: on-failure
+    networks:
+      - myapp_network
+    command: "kong start"
+    volumes:
+      - ./kong:/usr/local/kong/declarative/
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8080
+      KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
+      KONG_ADMIN_LISTEN: 0.0.0.0:9000
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+
+  mongodb:
+    hostname: mongodb
+    image: "mongo"
+    ports:
+      - "27017:27017"
+    restart: on-failure
+    volumes:
+      -  mongodata:/data/db
+    networks:
+      - myapp_network
+
+  auth:
+    hostname: auth_host
+    container_name: auth_service
+    build:
+      context: ./auth/
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - rabbitmq
+      - mongodb
+    networks:
+      - myapp_network
+
+  admin:
+    hostname: admin_host
+    container_name: admin_service
+    build:
+      context: ./admin/
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    depends_on:
+      - rabbitmq
+      - mongodb
+    networks:
+      - myapp_network
+
+  user:
+    hostname: user_host
+    container_name: user_service
+    build:
+      context: ./user/
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+    depends_on:
+      - rabbitmq
+      - mongodb
+    networks:
+      - myapp_network
+
+volumes:
+  rabbitmq_data:
+  mongodata:
+
+networks:
+  myapp_network:

@@ -1,0 +1,26 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  #This is the name of service
+  - name: admin_service
+    url: "http://admin_host:5002/admin"
+    #Here we can provide the end points of the service we want to avail for the client
+    routes:
+    - name: admin
+      paths:
+      - /admin
+  
+  - name: user_service
+    url: "http://user_host:5003/user"
+    routes:
+    - name: user
+      paths:
+      - /user
+
+  - name: auth_service
+    url: "http://auth_host:5001/auth"
+    routes:
+    - name: auth
+      paths:
+      - /auth
