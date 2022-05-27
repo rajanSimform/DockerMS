@@ -41,19 +41,19 @@ services:
     networks:
       - myapp_network
 
-  # auth:
-  #   hostname: auth_host
-  #   container_name: auth_service
-  #   build:
-  #     context: ./auth/
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "5001:5001"
-  #   depends_on:
-  #     - rabbitmq
-  #     - mongodb
-  #   networks:
-  #     - myapp_network
+  auth:
+    hostname: auth_host
+    container_name: auth_service
+    build:
+      context: ./auth/
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - rabbitmq
+      - mongodb
+    networks:
+      - myapp_network
 
   # admin:
   #   hostname: admin_host

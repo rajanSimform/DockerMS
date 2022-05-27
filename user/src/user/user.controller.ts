@@ -2,13 +2,22 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Post,
+  Res,
   UsePipes,
   ValidationPipe,
+  ValidationPipeOptions,
 } from '@nestjs/common';
-import { ValidationError } from 'class-validator';
-import { CreateUserDto } from './dto/createUser.dto';
+import { Response } from 'express';
+import { UserLoginDto } from './dto/userLogin.dto';
+import { UserSignUpDto } from './dto/userSignup.dto';
 import { UserService } from './user.service';
+
+const validDtoPipe = new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+});
 
 @Controller('user')
 export class UserController {
@@ -19,9 +28,16 @@ export class UserController {
     return this.userService.getAllUsers();
   }
 
-  @UsePipes(new ValidationPipe())
+  @UsePipes(validDtoPipe)
   @Post()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+  async userSignUp(@Body() userSignupDto: UserSignUpDto) {
+    return await this.userService.signUp(userSignupDto);
+  }
+
+  @UsePipes(validDtoPipe)
+  @Post('login')
+  async userLogin(@Body() userLoginDto: UserLoginDto, @Res() res: Response) {
+    const data = await this.userService.login(userLoginDto);
+    res.status(HttpStatus.OK).send(data);
   }
 }

@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AppService } from './app.service';
 
 @Controller('auth')
@@ -8,5 +9,11 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @MessagePattern('generateToken')
+  async generateAuthToken(@Payload() user) {
+    // console.log('data from userservice:', user);
+    return this.appService.generateToken(user);
   }
 }

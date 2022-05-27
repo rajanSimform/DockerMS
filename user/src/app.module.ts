@@ -5,7 +5,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AllExceptionsFilter } from './exception.interceptor';
+import { AllExceptionsFilter } from './common/exception.interceptor';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -14,19 +14,6 @@ import { UserModule } from './user/user.module';
       isGlobal: true,
       envFilePath: `${process.cwd()}/config/dev.env`,
     }),
-    ClientsModule.register([
-      {
-        name: 'USER_PROXY',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://guest:guest@rabbitmq:5672'],
-          queue: 'main_queue',
-          queueOptions: {
-            durable: false,
-          },
-        },
-      },
-    ]),
     MongooseModule.forRoot('mongodb://mongodb:27017/user-microservice'),
     UserModule,
   ],
