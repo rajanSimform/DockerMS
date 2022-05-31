@@ -30,55 +30,43 @@ export class UserService {
     return this.user.findOne({ email });
   }
 
-  private async comparePswd(password: string, passwordHash: string) {
-    return await compare(password, passwordHash);
+  async createUser(userSignUpDto: UserSignUpDto) {
+    try {
+      const { email, password } = userSignUpDto;
+
+      const exists = await this.findUserByEmail(email);
+      if (exists) {
+        throw new HttpException('Email already exist', HttpStatus.CONFLICT);
+      }
+
+      const hashedPassword = await hash(password, 10);
+
+      const newUser = await this.user.create({
+        ...userSignUpDto,
+        password: hashedPassword,
+      });
+
+      return newUser.toJSON();
+    } catch (e) {
+      return e;
+    }
   }
 
-  async signUp(userSignUpDto: UserSignUpDto) {
-    const { email, password } = userSignUpDto;
-    const hashedPassword = await hash(password, 10);
+  async validateUser(loginDto: UserLoginDto) {
+    try {
+      const { email, password } = loginDto;
+      const user = await this.findUserByEmail(email);
+      if (!user) {
+        throw new NotFoundException('User Not Found');
+      }
+      const passwordHash = user.password;
+      if (!(await compare(password, passwordHash))) {
+        throw new BadRequestException('Incorrect Password');
+      }
 
-    const exists = await this.findUserByEmail(email);
-    if (exists) {
-      throw new HttpException('Email already exist', HttpStatus.CONFLICT);
+      return user.toJSON();
+    } catch (e) {
+      return e;
     }
-
-    const newUser = await this.user.create({
-      ...userSignUpDto,
-      password: hashedPassword,
-    });
-
-    const generatedToken: string = await firstValueFrom(
-      this.tokenProxy.send('generateToken', newUser.toJSON()),
-    );
-    // console.log('token from auth service = ', generatedToken);
-
-    const { password: p, __v, ...filteredUser } = newUser.toJSON();
-
-    return {
-      user: filteredUser,
-      accessToken: generatedToken,
-    };
-  }
-
-  async login(userLoginDto: UserLoginDto) {
-    const { email, password } = userLoginDto;
-    const user = await this.findUserByEmail(email);
-    if (!user) {
-      throw new NotFoundException('User Not Found');
-    }
-    const passwordHash = user.password;
-    if (!(await compare(password, passwordHash))) {
-      throw new BadRequestException('Incorrect Password');
-    }
-    const generatedToken: string = await firstValueFrom(
-      this.tokenProxy.send('generateToken', user.toJSON()),
-    );
-    const { password: p, __v, ...filteredUser } = user.toJSON();
-
-    return {
-      user: filteredUser,
-      accessToken: generatedToken,
-    };
   }
 }

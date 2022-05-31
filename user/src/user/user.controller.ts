@@ -1,43 +1,32 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Post,
-  Res,
-  UsePipes,
-  ValidationPipe,
-  ValidationPipeOptions,
-} from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { AuthGuard } from 'src/guard/auth.guard';
 import { UserLoginDto } from './dto/userLogin.dto';
 import { UserSignUpDto } from './dto/userSignup.dto';
 import { UserService } from './user.service';
 
-const validDtoPipe = new ValidationPipe({
-  whitelist: true,
-  forbidNonWhitelisted: true,
-});
+// const validDtoPipe = new ValidationPipe({
+//   whitelist: true,
+//   forbidNonWhitelisted: true,
+// });
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   getUsers() {
     return this.userService.getAllUsers();
   }
 
-  @UsePipes(validDtoPipe)
-  @Post()
-  async userSignUp(@Body() userSignupDto: UserSignUpDto) {
-    return await this.userService.signUp(userSignupDto);
+  @MessagePattern('create_user')
+  async userSignUp(@Payload() userSignupDto: UserSignUpDto) {
+    return await this.userService.createUser(userSignupDto);
   }
 
-  @UsePipes(validDtoPipe)
-  @Post('login')
-  async userLogin(@Body() userLoginDto: UserLoginDto, @Res() res: Response) {
-    const data = await this.userService.login(userLoginDto);
-    res.status(HttpStatus.OK).send(data);
+  @MessagePattern('validate_user')
+  async validateUser(@Payload() payload: UserLoginDto) {
+    return await this.userService.validateUser(payload);
   }
 }

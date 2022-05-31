@@ -55,6 +55,7 @@ services:
     restart: always
     volumes:
       - ./auth/src/:/app/src/
+      - /app/node_modules
     networks:
       - myapp_network
 
@@ -72,6 +73,7 @@ services:
   #   restart: always
   #   volumes:
   #     - ./admin/src/:/app/src/
+  #     - /app/node_modules
   #   networks:
   #     - myapp_network
 
@@ -89,6 +91,7 @@ services:
     restart: always
     volumes:
       - ./user/src/:/app/src/
+      - /app/node_modules
     networks:
       - myapp_network
 
