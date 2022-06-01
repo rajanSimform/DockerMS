@@ -5,7 +5,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AllExceptionsFilter } from './common/exception.interceptor';
+import { AllExceptionsFilter } from './common/interceptor/exception.interceptor';
 import { UserModule } from './user/user.module';
 
 @Module({

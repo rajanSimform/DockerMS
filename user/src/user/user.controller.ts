@@ -1,6 +1,7 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, UseGuards } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { AuthGuard } from 'src/guard/auth.guard';
+import { AuthUserId } from 'src/common/decoretor/user.decoretor';
+import { AuthGuard } from 'src/common/guard/auth.guard';
 import { UserLoginDto } from './dto/userLogin.dto';
 import { UserSignUpDto } from './dto/userSignup.dto';
 import { UserService } from './user.service';
@@ -28,5 +29,11 @@ export class UserController {
   @MessagePattern('validate_user')
   async validateUser(@Payload() payload: UserLoginDto) {
     return await this.userService.validateUser(payload);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('deleteMe')
+  async deleteUser(@AuthUserId() id: string) {
+    return await this.userService.deleteUserById(id);
   }
 }

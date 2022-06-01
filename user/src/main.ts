@@ -1,7 +1,7 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ResponseInterceptor } from './common/response.interceptor';
+import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { Transport } from '@nestjs/microservices';
 
 async function bootstrap() {

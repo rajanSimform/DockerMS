@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       // get request object from context
-      const req = context.switchToHttp().getRequest<Request>();
+      const req = context.switchToHttp().getRequest();
 
       // check for token in authorization header
       const Authorization = req.headers['authorization'];
@@ -33,6 +33,10 @@ export class AuthGuard implements CanActivate {
       );
 
       if (result.id && result.email) {
+        // attach id and email to the request
+        req._id = result.id;
+        req.email = result.email;
+
         return true;
       } else if (result.message) {
         throw new UnauthorizedException(result.message);
