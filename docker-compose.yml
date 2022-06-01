@@ -95,6 +95,25 @@ services:
     networks:
       - myapp_network
 
+  movie:
+    hostname: movie_host
+    container_name: movie_service
+    build:
+      context: ./movie/
+      dockerfile: Dockerfile
+    ports:
+      - "5004:5004"
+    depends_on:
+      - rabbitmq
+      - mongodb
+    restart: always
+    volumes:
+      - ./movie/src/:/app/src/
+      - /app/node_modules
+    networks:
+      - myapp_network
+
+
 volumes:
   rabbitmq_data:
   mongodata:

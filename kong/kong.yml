@@ -24,3 +24,10 @@ services:
     - name: auth
       paths:
       - /auth
+
+  - name: movie_service
+    url: "http://movie_host:5004/movie"
+    routes:
+    - name: movie
+      paths:
+      - /movie

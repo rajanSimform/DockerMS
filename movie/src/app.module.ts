@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AllExceptionsFilter } from './common/interceptor/exception.interceptor';
-import { UserModule } from './user/user.module';
+import { MovieModule } from './movie/movie.module';
 
 @Module({
   imports: [
@@ -13,8 +13,13 @@ import { UserModule } from './user/user.module';
       isGlobal: true,
       envFilePath: `${process.cwd()}/config/dev.env`,
     }),
-    MongooseModule.forRoot('mongodb://mongodb:27017/user-microservice'),
-    UserModule,
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigService): any => {
+        return { uri: configService.get<string>('MONGO_URL') };
+      },
+      inject: [ConfigService],
+    }),
+    MovieModule,
   ],
   controllers: [AppController],
   providers: [

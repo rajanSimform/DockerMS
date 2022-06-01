@@ -1,6 +1,6 @@
 FROM node:16-slim
 WORKDIR /app
 COPY package*.json /app/
-RUN npm install
+RUN npm ci
 COPY . /app
 CMD ["npm","run","start:dev"]
