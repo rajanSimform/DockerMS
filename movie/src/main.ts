@@ -7,6 +7,10 @@ import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: ['http://localhost:4200'],
+  });
+
   const configService = app.get(ConfigService);
   const APP_PORT = configService.get<string>('APP_PORT');
 
